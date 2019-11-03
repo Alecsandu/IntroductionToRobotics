@@ -1,2 +1,2 @@
 # IntroductionToRobotics
-Aici voi incarca temele pentru laborator.
+Here I am uploading the homework for the laboratory.
