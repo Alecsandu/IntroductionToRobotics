@@ -1,1 +1,3 @@
-First laboratory homework for this course: analogRGBControl.ico
+First laboratory homework for this course: analogRGBControl.ino
+
+With this program("analogRGBControl") we use three potentiometers in order to control each color channel of an RGB LED.
