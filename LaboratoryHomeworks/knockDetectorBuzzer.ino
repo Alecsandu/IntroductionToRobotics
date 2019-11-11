@@ -36,9 +36,10 @@ void loop() {
   }
   pushButtonState = digitalRead(pushButton);
   
-  if(!pushButton) {
+  if(!pushButtonState) {
     Serial.println("BUTTON PRESSED!");
     noTone(activeBuzzerPin);
     knockValue = 0;
+    pushButtonState = !pushButtonState;
   }
 }
