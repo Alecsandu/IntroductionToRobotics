@@ -9,4 +9,4 @@ Finally, we will give these three values as arguments to the function void setCo
 will control the colors of a RGB LED with the help of analogWrite() function.
 ### 2nd Homework
 **fileName**: knockDetectorBuzzer
-**description**: This program takes starts after a knock and after 5 second it plays a tone that can be stopped with the press of a button.
+**description**: This program starts after a knock and after 5 second it plays a tone that can be stopped with the press of a button.
