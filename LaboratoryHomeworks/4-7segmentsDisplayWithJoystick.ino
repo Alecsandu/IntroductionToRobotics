@@ -114,7 +114,6 @@ void loop() {
   yAxis = analogRead(pinY);
   buttonState = digitalRead(pinButton);
   if(digitSelected >= 0) {
-    // here the value of the digit selected is 
     if((yAxis > highAxis) && (millis() - lastMillis > millisWaitInterval)) {
       numbers[digitSelected]--;
       if(numbers[digitSelected] < 0) {
