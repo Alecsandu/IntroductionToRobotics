@@ -24,7 +24,7 @@ const int noOfDigits = 10;
 // variables used for the joystick
 int xAxis;
 int yAxis;
-const int highAxis = 800;
+const int highAxis = 750;
 const int lowAxis = 200;
 int buttonState;
 int lastButtonState = HIGH;
@@ -114,6 +114,7 @@ void loop() {
   yAxis = analogRead(pinY);
   buttonState = digitalRead(pinButton);
   if(digitSelected >= 0) {
+    // here the value of the digit selected is increased/ decreased here
     if((yAxis > highAxis) && (millis() - lastMillis > millisWaitInterval)) {
       numbers[digitSelected]--;
       if(numbers[digitSelected] < 0) {
@@ -136,6 +137,7 @@ void loop() {
       lastButtonState = buttonState;
     }
   } else {
+    //     here we change the digit for which we will increase or decrease its value
     if((xAxis > highAxis) && (millis() - lastMillis > millisWaitInterval)) {
       digitSelected--;
       if(digitSelected == - noOfDisplays - 1) {
