@@ -37,16 +37,37 @@ const int highAxis = 800;
 int xAxisReset = 1;
 int lastButtonValue = 1;
 
-int buttonGotPressed() {
-  int buttonValue = digitalRead(buttonPin);
-  if (buttonValue == 0 && lastButtonValue == 1) {
-    lastButtonValue = 0;
-    return 1;
+void setup() {
+  lcd.begin(16, 2);
+  pinMode(pinX, INPUT);
+  pinMode(pinY, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+  Serial.begin(9600);
+  //freeSpace();   // I call this function when I want to get rid of the highest score that is stored  
+  loadHighscore();
+}
+
+void loop() {
+  
+  if (!menuWasSelected) {
+    if (buttonGotPressed()){
+      menuWasSelected = 1;
+    }
+    else {
+      selectOption();
+    }
   }
-  if (buttonValue == 1 && lastButtonValue == 0) {
-      lastButtonValue = 1;
+  else {
+    if (menuSelected == 1) {
+      playGame();    
+    }
+    else if (menuSelected == 2) {
+      changeSettings();
+    }
+    else if (menuSelected == 3) {
+      displayHighScore();
+    }
   }
-  return 0;
 }
 
 void saveHighscore() {
@@ -102,6 +123,18 @@ void displayGameStatus(int currentLives, int levelValue, int currentScore) {
 int gameEnded() {
   if (millis() - startingTime > 9900) {
     return 1;
+  }
+  return 0;
+}
+
+int buttonGotPressed() {
+  int buttonValue = digitalRead(buttonPin);
+  if (buttonValue == 0 && lastButtonValue == 1) {
+    lastButtonValue = 0;
+    return 1;
+  }
+  if (buttonValue == 1 && lastButtonValue == 0) {
+      lastButtonValue = 1;
   }
   return 0;
 }
@@ -258,37 +291,4 @@ void selectOption() {
     xAxisReset = 1;
   }
   displayMenu();
-}
-
-void setup() {
-  lcd.begin(16, 2);
-  pinMode(pinX, INPUT);
-  pinMode(pinY, INPUT);
-  pinMode(buttonPin, INPUT_PULLUP);
-  Serial.begin(9600);
-  //freeSpace();   // I call this function when I want to get rid of the highest score that is stored  
-  loadHighscore();
-}
-
-void loop() {
-  
-  if (!menuWasSelected) {
-    if (buttonGotPressed()){
-      menuWasSelected = 1;
-    }
-    else {
-      selectOption();
-    }
-  }
-  else {
-    if (menuSelected == 1) {
-      playGame();    
-    }
-    else if (menuSelected == 2) {
-      changeSettings();
-    }
-    else if (menuSelected == 3) {
-      displayHighScore();
-    }
-  }
 }
