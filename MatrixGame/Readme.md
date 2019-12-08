@@ -1,6 +1,6 @@
 ## LED MATRIX GAME - SNAKE
 <hr>
-<br/>**The game**<br/>
+**The game**<br/>
 It's the classic Snake that we all know and love. You will have to control the movement of a snake in order to make him reach the food that will make its length increase after he eats it but make sure not to hit your body after getting to a great lenth. Also in more difficult scenarios you will have to make sure that he will not hit any walls because otherwise he will die and the game will be over.<br/>
 <br/>**How to play**<br/>
 You will start from the center of the 8x8 LED matrix.<br>
