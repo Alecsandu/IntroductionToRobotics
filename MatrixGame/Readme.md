@@ -12,7 +12,7 @@ There will be 4 types of movement up, down, left or right done with the help of 
   - it will be a time pressure to get to the food spot
   - maybe more lives
   - the hight score will be saved on EEPROM
-<br/>**Hardware**<br/>
+**Hardware**
 ```
 - 8x8 LED matrix
 - LCD
