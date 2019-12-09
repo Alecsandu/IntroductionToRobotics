@@ -15,7 +15,7 @@ You will start from the center of the 8x8 LED matrix.<br>
 There will be 4 types of movement up, down, left or right done with the help of the joystick. If you want to make the snake eat the food you will have to direct its head to a led that blinks (it marks the food spot). You will have to be quick because the food spot will vanish after some seconds.<br/>
 <br/>**Other specifications**<br/>
   - will have a score that will increase when you get to a food spot<br>
-  - as the time passes you speed on the matrix will increase
+  - as the time passes your movement speed on the matrix will increase
   - there will me more maps to choose from
   - it will be a time pressure to get to the food spot
   - maybe more lives
