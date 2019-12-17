@@ -97,10 +97,10 @@ const int highAxis = 800;
 int xAxisReset = 1;
 int lastButtonValue = 1;
 /*---------------------------For snek----------------------------------------*/
-int foodX;
-int foodY;
-int oldFoodX;
-int oldFoodY;
+int foodX = 2;
+int foodY = 2;
+int oldFoodX = 2;
+int oldFoodY = 2;
 bool hitFood = false;
 bool initFood = false;
 int scoreFood = 0;
@@ -110,6 +110,11 @@ bool eaten = false;
 unsigned long previousMillis = 0;
 const long interval = 200;
 bool foodBlinked = true;
+unsigned long prevMil = 0;
+bool ok = false;
+bool moreLife = false;
+unsigned long theTime = 0;
+unsigned long prevTime = 0;
 
 void setup() {
   randomSeed(analogRead(0));
@@ -146,21 +151,71 @@ void loop() {
     else if (menuSelected == 3) {
       displayHighScore();
     }
+    else if (menuSelected == 4) {
+      info();
+    }
   }
+}
+
+void info() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastDisplayMillis >= displayDelay) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Game: Snake");
+    lcd.setCursor(0, 1);
+    lcd.print("DoneBy:Alexandru");
+
+    delay(2000);
+
+    lcd.clear();
+    lcd.setCursor(2, 0);
+    lcd.print("GitHub link: ");
+
+    delay(2000);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("https://github.c");
+    lcd.setCursor(0, 1);
+    lcd.print("om/alecsandu");
+
+    delay(2000);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("@ UnibucRobotics");
+
+    delay(2000);
+    
+    menuWasSelected = 0;
+    lastDisplayMillis = currentMillis;
+  } 
 }
 
 void initGame(int lvl) {
   if (!initFood) {
+    theTime = 30;
     currentScore = 0;
     posX = 4;
     posY = 4;
     oldPosX = 4;
     oldPosY = 4;
-    foodX = random(0, 8);
-    foodY = random(0, 8);
-    while (checkIfOneIsOnPos(lvl, foodX, foodY) && foodX == posX && foodY == posY) {
+    if (lvl == 1 ) {
       foodX = random(0, 8);
       foodY = random(0, 8);
+      while (checkIfOneIsOnPos(lvl, foodX, foodY) || (foodX == posX && foodY == posY) || (foodX == oldFoodX && foodY == oldFoodY)) {
+        foodX = random(0, 8);
+        foodY = random(0, 8);
+      }
+    }
+    else {
+      foodX = random(1, 7);
+      foodY = random(1, 7);
+      while (checkIfOneIsOnPos(lvl, foodX, foodY) || (foodX == posX && foodY == posY) || (foodX == oldFoodX && foodY == oldFoodY)) {
+        foodX = random(1, 7);
+        foodY = random(1, 7);
+      }
     }
     lc.clearDisplay(0);
     oldFoodX = foodX;
@@ -200,6 +255,8 @@ void loadHighScore() {
 }
 
 void freeSpace() {
+  gameHighScore = 0;
+  bestPlayer[0] = "Nothing";
   for (int i = 0 ; i < EEPROM.length() ; i++) {
     EEPROM.write(i, 0);
   }
@@ -217,18 +274,21 @@ int buttonGotPressed() {
   return 0;
 }
 
-void displayGameStatus() {
-  if (millis() - lastDisplayMillis > displayDelay) {
+void displayGameStatus(int lvl) {
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastDisplayMillis > displayDelay) {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Lives:");
     lcd.print(currentLives);
     lcd.print(" Level:");
-    lcd.print(levelValue);
+    lcd.print(lvl);
     lcd.setCursor(0, 1);
     lcd.print("Score:");
     lcd.print(currentScore);
-    lastDisplayMillis = millis();
+    lcd.print(" Time:");
+    lcd.print(theTime);
+    lastDisplayMillis = currentMillis;
   }
 }
 
@@ -263,7 +323,8 @@ void loadMatrixLevel(int level) {
 }
 
 int gameEnded() {
-  if (millis() - startingTime > 30000) {
+  unsigned long mil = millis();
+  if (mil - startingTime > 30000) { 
     initFood = false;
     return 1;
   }
@@ -278,12 +339,21 @@ void makeNewFood(int lvl) {
   oldFoodX = foodX;
   oldFoodY = foodY;
   lc.setLed(0, oldFoodX, oldFoodY, false);
-  foodX = random(0, 8);
-  foodY = random(0, 8);
-  while (checkIfOneIsOnPos(lvl, foodX, foodY) && foodX == posX && foodY == posY
-  && foodX >= 1 && foodX <= 6 && foodY >= 1 && foodY <=6) {
+  if (lvl == 1) {
     foodX = random(0, 8);
     foodY = random(0, 8);
+    while ((checkIfOneIsOnPos(lvl, foodX, foodY)==true) || (foodX == posX && foodY == posY) || foodX < 1 || foodX > 6 || foodY < 1 || foodY > 6 || (foodX == oldFoodX && foodY == oldFoodY)) {
+      foodX = random(0, 8);
+      foodY = random(0, 8);
+    }
+  }
+  else {
+    foodX = random(1, 7);
+    foodY = random(1, 7);
+    while ((checkIfOneIsOnPos(lvl, foodX, foodY)==true) || (foodX == posX && foodY == posY) || foodX < 1 || foodX > 6 || foodY < 1 || foodY > 6 || (foodX == oldFoodX && foodY == oldFoodY)) {
+      foodX = random(1, 7);
+      foodY = random(1, 7);
+    }
   }
   lc.setLed(0, foodX, foodY, true);
 }
@@ -309,6 +379,15 @@ void blinkFood() {
   }
 }
 
+int getInterval(int lvl) {
+  if (lvl == 1)
+    return timeToGetFood1;
+  else if(lvl == 2)
+    return timeToGetFood2;
+  else if(lvl == 3)
+    return timeToGetFood3;
+}
+
 void playGame(int level) {
   if (funcChange) {
     currentLives = 3;
@@ -323,13 +402,32 @@ void playGame(int level) {
     makeNewFood(level);
     eaten = false;
   }
+  unsigned long st = millis();
+  if (st - prevTime >= 1000) {
+    prevTime = st;
+    --theTime;
+  }
+  unsigned long start = millis();
+  if(start - prevMil >= getInterval(level)) {
+    prevMil = start;
+    if(ok){
+      makeNewFood(level);
+      ok = !ok;
+    } else {
+      ok = !ok;
+    }
+  }
   blinkFood();
   if (currentScore > gameHighScore) {
+    if (!moreLife) {
+      currentLives++;
+      moreLife = true;
+    }
     gameHighScore = currentScore;
     strncpy(bestPlayer, currentPlayer, MAX_NAME_LEN + 1);
     saveHighScore();
   }
-  displayGameStatus();
+  displayGameStatus(level);
   if (gameEnded()) {
     if (currentLives != 0) {
       lcd.clear();
@@ -341,7 +439,7 @@ void playGame(int level) {
       lcd.clear();
       lc.clearDisplay(0);
       lcd.setCursor(4, 0);
-      lcd.print("YOU DIED");
+      lcd.print("YOU DIED :(");
       for (int row = 0;row < 8;row++) {
         for(int col = 0;col < 8;col++) {
           if (gameOverMatrix[row][col]>0) {
@@ -424,6 +522,9 @@ bool moveLed(int level) {
     movedX = false;
   }
   if (yValue > maxThreshold && movedY == false) {
+    if (checkIfOneIsOnPos(level, posX, posY - 1)) {
+      currentLives--;
+    }
     if (posY > 0 && (checkIfOneIsOnPos(level, posX, posY - 1) == false)) {
       oldPosY = posY;
       oldPosX = posX;
@@ -437,6 +538,9 @@ bool moveLed(int level) {
     movedY = true;
   }
   if (yValue < minThreshold && movedY == false) {
+    if (checkIfOneIsOnPos(level, posX, posY + 1)) {
+      currentLives--;
+    }
     if (posY < 8 && (checkIfOneIsOnPos(level, posX, posY + 1) == false)) {
       oldPosY = posY;
       oldPosX = posX;
@@ -468,13 +572,13 @@ void selectOption() {
   if (xAxis < lowAxis && xAxisReset) {
     menuSelected--;
     if (menuSelected < 1) {
-      menuSelected = 3;
+      menuSelected = 4;
     }
     xAxisReset = 0;
   }
   else if (xAxis > highAxis && xAxisReset) {
     menuSelected++;
-    if (menuSelected > 3) {
+    if (menuSelected > 4) {
       menuSelected = 1;
     }
     xAxisReset = 0;
@@ -495,6 +599,11 @@ void changeSettings() {
     lastDisplayMillis = millis();
   }
   int xAxis = analogRead(pinX);
+  int yAxis = analogRead(pinY);
+  Serial.println(yAxis);
+  if (yAxis < 100) {
+    freeSpace();
+  }
   if (xAxis < lowAxis && xAxisReset) {
     startingLevelValue--;
     if (startingLevelValue < 1) {
@@ -526,6 +635,10 @@ void refreshName() {
     }
     char ch = (char)incomingByte;
     if (incomingByte != 10) {
+      currentPlayer[charNo] = ch;
+      charNo++;
+    }
+    else {
       currentPlayer[charNo] = NULL;
       charNo = 0;
       justPass = 1;
@@ -540,7 +653,8 @@ void refreshName() {
 }
 
 void displayMenu() {
-  if (millis() - lastDisplayMillis > displayDelay) {
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastDisplayMillis > displayDelay) {
     lcd.clear();
     lcd.setCursor(0, 0);
     if (menuSelected == 1) {
@@ -566,16 +680,28 @@ void displayMenu() {
       lcd.print(" ");
     }
     lcd.print("HighScore ");
+    if (menuSelected == 4) {
+      lcd.print(">");
+    }
+    else {
+      lcd.print(" ");
+    }
+    lcd.print("Info");
     
-    lastDisplayMillis = millis();
+    lastDisplayMillis = currentMillis;
   }
 }
 
 void displayHighScore() {
-  lcd.clear();
-  lcd.print(bestPlayer);
-  lcd.print(" ");
-  lcd.print(gameHighScore);
+  if (EEPROM[0] == 0) {
+    lcd.clear();
+    lcd.print("Nothing 0");
+  } else {
+    lcd.clear();
+    lcd.print(bestPlayer);
+    lcd.print(" ");
+    lcd.print(gameHighScore);
+  }
   while(1) {
     if (buttonGotPressed()) {
       menuWasSelected = 0;
