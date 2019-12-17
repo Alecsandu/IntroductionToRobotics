@@ -9,15 +9,14 @@
 - MAX7219 Driver
 ```
 **The game**<br/>
-It's the classic Snake that we all know and love. You will have to control the movement of a snake in order to make him reach the food that will make its length increase after he eats it, but make sure not to hit your body after reaching a great lenth. Also in more difficult scenarios you will have to make sure that he will not hit any walls because otherwise he will die and the game will be over.<br/>
+You will have to control the movement of a snake in order to make him reach the food, but make sure to get to it in time. Also in more difficult scenarios you will have to make sure that you will not hit any walls because otherwise your snake will die and the game will be over.<br/>
 <br/>**How to play**<br/>
 You will start from the center of the 8x8 LED matrix.<br>
-There will be 4 types of movement up, down, left or right done with the help of the joystick. If you want to make the snake eat the food you will have to direct its head to a led that blinks (it marks the food spot). You will have to be quick because the food spot will vanish after some seconds.<br/>
+There will be 4 types of movement up, down, left or right done with the help of the joystick. If you want to make the snake eat the food you will have to direct him to a led that blinks (it marks the food spot). You will have to be quick because the food spot will vanish after some seconds depending on the difficulty of the level that has been selected.<br/>
 <br/>**Other specifications**<br/>
   - will have a score that will increase when you get to a food spot<br>
-  - as the time passes your movement speed on the matrix will increase
-  - there will me more maps to choose from
+  - there will me more levels to choose from
   - it will be a time pressure to get to the food spot
-  - maybe more lives
-  - the hight score will be saved on EEPROM
+  - if you can beat the highest score you will get one extra life
+  - the highest score will be saved on EEPROM
 
