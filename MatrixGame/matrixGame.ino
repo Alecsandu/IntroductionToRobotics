@@ -75,6 +75,16 @@ bool gameOverMatrix[8][8] = {
   {0, 1, 0, 0, 0, 0, 1, 0},
   {1, 0, 0, 0, 0, 0, 0, 1}
 };
+bool helloMatrice[8][8] = {
+  {0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 1, 1, 0, 0, 1, 1, 0},
+  {0, 1, 1, 0, 0, 1, 1, 0},
+  {0, 0, 0, 0, 1, 0, 0, 0},
+  {0, 0, 0, 0, 1, 0, 0, 0},
+  {0, 1, 0, 0, 0, 0, 1, 0},
+  {0, 0, 1, 1, 1, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0}
+};
 const int timeToGetFood3 = 4000;
 LedControl lc = LedControl(dinPin, clkPin, loadPin, noOfDrivers);// DIN, CLK, LOAD, NoOfDrivers
 
@@ -127,7 +137,7 @@ void setup() {
   pinMode(pinY, INPUT);
   pinMode(buttonPin, INPUT_PULLUP);
   loadHighScore();
-  //freeSpace();
+  helloWorld();
   Serial.begin(9600);
 }
 
@@ -155,6 +165,24 @@ void loop() {
       info();
     }
   }
+}
+
+void helloWorld() {
+  for (int row = 0; row < 8; ++row) {
+    for (int col = 0; col < 8; ++col) {
+      if (helloMatrice[row][col] > 0) {
+        lc.setLed(0, row, col, true);
+      }
+    }
+  }
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("   Agility Snake");
+  lcd.setCursor(0, 1);
+  lcd.print("Test your speed");
+  delay(3000);
+  lcd.clear();
+  lc.clearDisplay(0);
 }
 
 void info() {
@@ -394,6 +422,7 @@ void playGame(int level) {
     previousMillis = 0;
     startingTime = millis();
     funcChange = 0;
+    currentScore = 0;
     levelValue = level * random(1, 11);
     loadMatrixLevel(level);
   }
@@ -603,6 +632,9 @@ void changeSettings() {
   Serial.println(yAxis);
   if (yAxis < 100) {
     freeSpace();
+  }
+  if (yAxis >800) {
+    
   }
   if (xAxis < lowAxis && xAxisReset) {
     startingLevelValue--;
