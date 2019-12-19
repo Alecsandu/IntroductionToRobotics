@@ -14,19 +14,6 @@ After that with the help of the X and Y axis of the joystick you will change Sna
 
 After the time is up or your Snacko died you will see your score and will be asked to press the button in order to get back to the main menu.
 
-## Technical requirements / Hardware used
-The game is displayed on on a 8x8 matrix using a MAX7219 driver.
-
-For the controls it is used a joystick.
-
-While you are playing the game you can see on the LCD screen the number of lives, the level that you selected to play, score and how much time is left.
-
-You can control the LCD's contrast with the help of a potentiometer.
-
-The score is calculated by adding to the current score, each time you get to a food spot, a random number, that was generated when you started the level, multiplicated with the value of the level.
-
-So if you want to beat the highest score you need to have both luck and skill.
-
 ## Main menu (LCD's screen)
 It has 4 options to choose from:
 ### 1.Start
@@ -42,6 +29,19 @@ Here you can see the name of the game, my name (the creator of the game), my Git
 - If you can beat the highest score you will get one extra life
 - The highest score will be saved on EEPROM
 - Depending on the level you choosed, the amount of seconds that you have in order to get to the food spot will vary
+
+## Technical requirements / Hardware used
+The game is displayed on on a 8x8 matrix using a MAX7219 driver.
+
+For the controls it is used a joystick.
+
+While you are playing the game you can see on the LCD screen the number of lives, the level that you selected to play, score and how much time is left.
+
+You can control the LCD's contrast with the help of a potentiometer.
+
+The score is calculated by adding to the current score, each time you get to a food spot, a random number, that was generated when you started the level, multiplicated with the value of the level.
+
+So if you want to beat the highest score you need to have both luck and skill.
 
 ### Hardware
 - 1 * 8x8 LED matrix <br/>
