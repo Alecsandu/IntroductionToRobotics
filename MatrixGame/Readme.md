@@ -1,7 +1,5 @@
 # LED MATRIX GAME - Agility SNAKE
 
-Game presentation:
-
 ## The game
 You play as "Snacko" a lazy snake that has awakened after a long and cold winter. Now he is hungry and wants you to direct him to the prey as fast as you can because after some time the prey will notice him and disappear. Either way, if you get it or not, you will have to direct Snacko to a new food spot until he will be bored and go back to sleep. So, if you want to achive a great score you will have to move him quick and watch out for the walls, because if you make him hit them too many times he will get injured and eventually die.
 
@@ -32,3 +30,7 @@ Here you can see the name of the game, my name (the creator of the game), my Git
 - If you can beat the highest score you will get one extra life
 - The highest score will be saved on EEPROM
 - Depending on the level you choosed, the amount of seconds that you have in order to get to the food spot will vary
+
+## Game presentation
+Link to the video:
+Link to the image of the profect:
