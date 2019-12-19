@@ -33,4 +33,4 @@ Here you can see the name of the game, my name (the creator of the game), my Git
 
 ## Game presentation
 Link to the video:
-Link to the image of the profect:
+Link to the image of the project:
