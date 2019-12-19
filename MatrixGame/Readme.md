@@ -26,18 +26,7 @@ You can control the LCD's contrast with the help of a potentiometer.
 The score is calculated by adding to the current score, each time you get to a food spot, a random number, that was generated when you started the level, multiplicated with the value of the level.
 
 So if you want to beat the highest score you need to have both luck and skill.
-### Hardware
-- 1 * 8x8 LED matrix <br/>
-- 1 * LCD <br/>
-- 1 * Joystick<br/>
-- 1 * MAX7219 Driver<br/>
-- 1 * Potentiometer<br/>
-- Wires<br/>
-- Resistors (220 Ohm & 10k Ohm)<br/>
-- Arduino<br/>
-- Connector cable<br/>
-- 1 * Breadbord<br/>
-- 1 * Mini Breadbords<br/> 
+
 ## Main menu (LCD's screen)
 It has 4 options to choose from:
 ### 1.Start
@@ -53,6 +42,19 @@ Here you can see the name of the game, my name (the creator of the game), my Git
 - If you can beat the highest score you will get one extra life
 - The highest score will be saved on EEPROM
 - Depending on the level you choosed, the amount of seconds that you have in order to get to the food spot will vary
+
+### Hardware
+- 1 * 8x8 LED matrix <br/>
+- 1 * LCD <br/>
+- 1 * Joystick<br/>
+- 1 * MAX7219 Driver<br/>
+- 1 * Potentiometer<br/>
+- Wires<br/>
+- Resistors (220 Ohm & 10k Ohm)<br/>
+- Arduino<br/>
+- Connector cable<br/>
+- 1 * Breadbord<br/>
+- 1 * Mini Breadbords<br/> 
 
 ## Game presentation
 Link to the video:
