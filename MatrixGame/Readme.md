@@ -23,9 +23,21 @@ While you are playing the game you can see on the LCD screen the number of lives
 
 You can control the LCD's contrast with the help of a potentiometer.
 
-The score is calculated by adding to the current score, each time you get to a food spot, a random number, that was generated when you started the level, multiplicated with the value of the level. So if you want to beat the highest score you need to have both luck and skill.
-### Hardware
+The score is calculated by adding to the current score, each time you get to a food spot, a random number, that was generated when you started the level, multiplicated with the value of the level.
 
+So if you want to beat the highest score you need to have both luck and skill.
+### Hardware
+- 1 * 8x8 LED matrix <br/>
+- 1 * LCD <br/>
+- 1 * Joystick<br/>
+- 1 * MAX7219 Driver<br/>
+- 1 * Potentiometer<br/>
+- Wires<br/>
+- Resistors (220 Ohm & 10k Ohm)<br/>
+- Arduino<br/>
+- Connector cable<br/>
+- 1 * Breadbord<br/>
+- 1 * Mini Breadbords<br/> 
 ## Main menu (LCD's screen)
 It has 4 options to choose from:
 ### 1.Start
