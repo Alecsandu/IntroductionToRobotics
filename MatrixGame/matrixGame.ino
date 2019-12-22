@@ -106,7 +106,7 @@ const int lowAxis = 100;
 const int highAxis = 800;
 int xAxisReset = 1;
 int lastButtonValue = 1;
-/*---------------------------For snek----------------------------------------*/
+/*---------------------------For snako----------------------------------------*/
 int foodX = 2;
 int foodY = 2;
 int oldFoodX = 2;
@@ -125,10 +125,10 @@ bool ok = false;
 bool moreLife = false;
 unsigned long theTime = 0;
 unsigned long prevTime = 0;
+unsigned long playTimeDelay = 0;// for the 25 delay
 
 void setup() {
   randomSeed(analogRead(0));
-  // the zero refers to the MAX7219 number, it is zero for 1 chip
   lcd.begin(16, 2);
   lc.shutdown(0, false); // turn of power saving, enables display
   lc.setIntensity(0, brightness);// sets brightness (0~15 possible values)
@@ -136,8 +136,8 @@ void setup() {
   pinMode(pinX, INPUT);
   pinMode(pinY, INPUT);
   pinMode(buttonPin, INPUT_PULLUP);
-  loadHighScore();
-  helloWorld();
+  loadHighScore(); //loads the highest score when the game is turned on
+  helloWorld(); //print an welcome message when the game is turned on
   Serial.begin(9600);
 }
 
@@ -166,7 +166,7 @@ void loop() {
     }
   }
 }
-
+// This function displays a welcome message on the lcd when the game is turned on
 void helloWorld() {
   for (int row = 0; row < 8; ++row) {
     for (int col = 0; col < 8; ++col) {
@@ -180,47 +180,75 @@ void helloWorld() {
   lcd.print("   Agility Snake");
   lcd.setCursor(0, 1);
   lcd.print("Test your speed");
-  delay(3000);
+  delay(3000);//here I used delay because it will be executed only once
   lcd.clear();
   lc.clearDisplay(0);
 }
-
-void info() {
-  unsigned long currentMillis = millis();
-  if (currentMillis - lastDisplayMillis >= displayDelay) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Game: Snake");
-    lcd.setCursor(0, 1);
-    lcd.print("DoneBy:Alexandru");
-
-    delay(2000);
-
-    lcd.clear();
-    lcd.setCursor(2, 0);
-    lcd.print("GitHub link: ");
-
-    delay(2000);
-
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("https://github.c");
-    lcd.setCursor(0, 1);
-    lcd.print("om/alecsandu");
-
-    delay(2000);
-
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("@ UnibucRobotics");
-
-    delay(2000);
-    
-    menuWasSelected = 0;
-    lastDisplayMillis = currentMillis;
-  } 
+// selectOption() helps you select the option from the main menu that you want to use(Start, Setup, Highscore or Info)
+void selectOption() {
+  int xAxis = analogRead(pinX);
+  if (xAxis < lowAxis && xAxisReset) {
+    menuSelected--;
+    if (menuSelected < 1) {
+      menuSelected = 4;
+    }
+    xAxisReset = 0;
+  }
+  else if (xAxis > highAxis && xAxisReset) {
+    menuSelected++;
+    if (menuSelected > 4) {
+      menuSelected = 1;
+    }
+    xAxisReset = 0;
+  }
+  else if (xAxis >= lowAxis && xAxis <= highAxis) {
+    xAxisReset = 1;
+  }
+  displayMenu();
 }
 
+void displayMenu() {
+  unsigned long currentMillis = millis();
+  if (currentMillis - lastDisplayMillis > displayDelay) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    if (menuSelected == 1) {
+      lcd.print(">");
+    }
+    else {
+      lcd.print(" ");
+    }
+    lcd.print("Start ");
+    if (menuSelected == 2) {
+      lcd.print(">");
+    }
+    else {
+      lcd.print(" ");
+    }
+    lcd.print("Setup");
+    
+    lcd.setCursor(0, 1);
+    if (menuSelected == 3) {
+      lcd.print(">");
+    }
+    else {
+      lcd.print(" ");
+    }
+    lcd.print("HighScore ");
+    if (menuSelected == 4) {
+      lcd.print(">");
+    }
+    else {
+      lcd.print(" ");
+    }
+    lcd.print("Info");
+    
+    lastDisplayMillis = currentMillis;
+  }
+}
+/*
+ * Before each new game I reinitialize some of the variables that are going to be used again
+ */
 void initGame(int lvl) {
   if (!initFood) {
     theTime = 30;
@@ -253,6 +281,189 @@ void initGame(int lvl) {
   }
 }
 
+void playGame(int level) {
+  // here I see if its the first time that I use this function
+  if (funcChange) {
+    currentLives = 3;
+    previousMillis = 0;
+    startingTime = millis();
+    funcChange = 0;
+    currentScore = 0;
+    levelValue = level * random(1, 11);
+    loadMatrixLevel(level);
+  }
+  if(moveLed(level) && eaten == true) {
+    currentScore += levelValue;
+    makeNewFood(level);
+    eaten = false;
+  }
+  unsigned long st = millis();
+  /*Each second decreases the amount of time that is left
+   *(only the variable that is used to display it)
+   */
+  if (st - prevTime >= 1000) {
+    prevTime = st;
+    --theTime;
+  }
+  unsigned long start = millis();
+  if(start - prevMil >= getInterval(level)) {//here I check if arrived in time at the food spot and if not I generate a new position for the food spot
+    prevMil = start;
+    if(ok){
+      makeNewFood(level);
+      ok = !ok;
+    } else {
+      ok = !ok;
+    }
+  }
+  blinkFood();
+  if (currentScore > gameHighScore) {
+    if (!moreLife) {//if the highscore was bested I awart it with a bonus life
+      currentLives++;
+      moreLife = true;
+    }
+    gameHighScore = currentScore;
+    strncpy(bestPlayer, currentPlayer, MAX_NAME_LEN + 1);
+    saveHighScore();
+  }
+  displayGameStatus(level);
+  if (gameEnded()) {
+    /*
+     * here I check if the player died or the time is up 
+     * if the player died I load a matrix that displays a X on the 8x8 matrix and show the score on the lcd
+     * else I leave the matrix unchanged and just display the score on the lcd
+     */
+    if (currentLives != 0) {
+      lcd.clear();
+      lcd.print("Your score:");
+      lcd.print(currentScore);
+      lcd.setCursor(0, 1);
+      lcd.print("Press THE button");
+    }
+    else {
+      lcd.clear();
+      lc.clearDisplay(0);
+      lcd.setCursor(4, 0);
+      lcd.print("YOU DIED :(");
+      lcd.setCursor(0, 1);
+      lcd.print("Your score:");
+      lcd.print(currentScore);
+      for (int row = 0;row < 8;row++) {
+        for(int col = 0;col < 8;col++) {
+          if (gameOverMatrix[row][col]>0) {
+            lc.setLed(0, row, col, true);
+          }
+        }
+      }
+    }
+    /*
+     * Here I use while (1) because I just wait for the user to push the button to go back to the main menu, also nothing else is waiting to be done apart from the push of the button
+     */
+    while (1) {
+      if (buttonGotPressed()) {
+        menuWasSelected = 0;
+        funcChange = 1;
+        lc.clearDisplay(0);
+        break;
+      }
+    }
+  }
+}
+/*
+ * Here you can change the level that you want to play
+ * or chnage the name that you want to have if opened the serial monitor
+ * or you can reset the highscore(this is not shown in anyway on the lcd, you have to know that you you use the yAxis of the joystick and turn it on the right side the score will reset)
+ */
+void changeSettings() {
+  if (millis() - lastDisplayMillis > displayDelay) {
+    lcd.clear();
+    lcd.print("Level: ");
+    lcd.print(startingLevelValue);
+    lcd.setCursor(0, 1);
+    lcd.print(currentPlayer);
+    lastDisplayMillis = millis();
+  }
+  int xAxis = analogRead(pinX);
+  int yAxis = analogRead(pinY);
+  Serial.println(yAxis);
+  if (yAxis < 100) {
+    freeSpace();
+  }
+  if (xAxis < lowAxis && xAxisReset) {
+    startingLevelValue--;
+    if (startingLevelValue < 1) {
+      startingLevelValue = 3;
+    }
+    xAxisReset = 0;
+  }
+  else if (xAxis > highAxis && xAxisReset) {
+    startingLevelValue++;
+    if (startingLevelValue > 3) {
+      startingLevelValue = 1;
+    }
+    xAxisReset = 0;
+  }
+  else if (xAxis >= lowAxis && xAxis <= highAxis) {
+    xAxisReset = 1;
+  }
+  refreshName();
+  if (buttonGotPressed()) {
+    menuWasSelected = 0;
+  }
+}
+
+void displayHighScore() {
+  if (EEPROM[0] == 0) { //if there is no score saved display 0
+    lcd.clear();
+    lcd.print("Nothing 0");
+  } else {
+    lcd.clear();
+    lcd.print(bestPlayer);
+    lcd.print(" ");
+    lcd.print(gameHighScore);
+  }
+  /*
+   * Here I use while (1) because I don't stop something from executing and just wait to press the button after I choosed what I want to do
+   */
+  while (1) {
+    if (buttonGotPressed()) {
+      menuWasSelected = 0;
+      break;
+    }
+  }
+}
+/*This function displays the name of the game, creator, my GitHub link and @UnibucRobotics
+I used delay() function here because info() is executed only once and after that I go back at displaying the main menu on the lcd*/
+void info() {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Game: Snake");
+    lcd.setCursor(0, 1);
+    lcd.print("DoneBy:Alexandru");
+
+    delay(2000);
+
+    lcd.clear();
+    lcd.setCursor(2, 0);
+    lcd.print("GitHub link: ");
+
+    delay(2000);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("https://github.c");
+    lcd.setCursor(0, 1);
+    lcd.print("om/alecsandu");
+
+    delay(2000);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("@ UnibucRobotics");
+
+    delay(2000);
+    menuWasSelected = 0;//this signals that I don't want to display info() again on the lcd 
+}
+
 void saveHighScore() {
   int v[MAX_NAME_LEN + 1];
   for (int i = 0; i <= MAX_NAME_LEN; ++i) {
@@ -282,6 +493,9 @@ void loadHighScore() {
   }
 }
 
+/*
+ * I use this function to reset the highscore
+ */
 void freeSpace() {
   gameHighScore = 0;
   bestPlayer[0] = "Nothing";
@@ -301,7 +515,9 @@ int buttonGotPressed() {
   }
   return 0;
 }
-
+/*
+ * After the game starts this function displays on the lcd the number of lives, the level, the score and the remaining time until the game ends
+ */
 void displayGameStatus(int lvl) {
   unsigned long currentMillis = millis();
   if (currentMillis - lastDisplayMillis > displayDelay) {
@@ -320,6 +536,7 @@ void displayGameStatus(int lvl) {
   }
 }
 
+//Depending on the matrix that coresponds to the selected level
 void loadMatrixLevel(int level) {
   if (level == 1) {
     for (int row = 0;row < 8;row++) {
@@ -349,7 +566,9 @@ void loadMatrixLevel(int level) {
     }
   }
 }
-
+/*
+ * If the time is up or if the player lost all its lives the game stops
+ */
 int gameEnded() {
   unsigned long mil = millis();
   if (mil - startingTime > 30000) { 
@@ -362,7 +581,9 @@ int gameEnded() {
   }
   return 0;
 }
-
+/*
+ * makeNewFood generates a new food position that is not in the walls or on the current position of the player or on the same position of the old food once again
+ */
 void makeNewFood(int lvl) {
   oldFoodX = foodX;
   oldFoodY = foodY;
@@ -406,7 +627,9 @@ void blinkFood() {
     }
   }
 }
-
+/*
+ * getInterval returns the amount of time that a player has to get to a food spot until a new one is generated
+ */
 int getInterval(int lvl) {
   if (lvl == 1)
     return timeToGetFood1;
@@ -415,79 +638,9 @@ int getInterval(int lvl) {
   else if(lvl == 3)
     return timeToGetFood3;
 }
-
-void playGame(int level) {
-  if (funcChange) {
-    currentLives = 3;
-    previousMillis = 0;
-    startingTime = millis();
-    funcChange = 0;
-    currentScore = 0;
-    levelValue = level * random(1, 11);
-    loadMatrixLevel(level);
-  }
-  if(moveLed(level) && eaten == true) {
-    currentScore += levelValue;
-    makeNewFood(level);
-    eaten = false;
-  }
-  unsigned long st = millis();
-  if (st - prevTime >= 1000) {
-    prevTime = st;
-    --theTime;
-  }
-  unsigned long start = millis();
-  if(start - prevMil >= getInterval(level)) {
-    prevMil = start;
-    if(ok){
-      makeNewFood(level);
-      ok = !ok;
-    } else {
-      ok = !ok;
-    }
-  }
-  blinkFood();
-  if (currentScore > gameHighScore) {
-    if (!moreLife) {
-      currentLives++;
-      moreLife = true;
-    }
-    gameHighScore = currentScore;
-    strncpy(bestPlayer, currentPlayer, MAX_NAME_LEN + 1);
-    saveHighScore();
-  }
-  displayGameStatus(level);
-  if (gameEnded()) {
-    if (currentLives != 0) {
-      lcd.clear();
-      lcd.print("Congratulations!");
-      lcd.setCursor(0, 1);
-      lcd.print("Press THE button");
-    }
-    else {
-      lcd.clear();
-      lc.clearDisplay(0);
-      lcd.setCursor(4, 0);
-      lcd.print("YOU DIED :(");
-      for (int row = 0;row < 8;row++) {
-        for(int col = 0;col < 8;col++) {
-          if (gameOverMatrix[row][col]>0) {
-            lc.setLed(0, row, col, true);
-          }
-        }
-      }
-    }
-    while (1) {
-      if (buttonGotPressed()) {
-        menuWasSelected = 0;
-        funcChange = 1;
-        lc.clearDisplay(0);
-        break;
-      }
-    }
-  }
-}
-
+/*
+ * this function checks if there is a wall on the position (x, y) from the map of the level 'lvl'
+ */
 bool checkIfOneIsOnPos(int level, int x, int y) {
   if (level == 1) {
     if (lvl1Matrix[x][y] == 1) {
@@ -511,154 +664,100 @@ bool checkIfOneIsOnPos(int level, int x, int y) {
     }
   }
 }
-
+/*
+ * moveLed changes the position of the player depending on his choice up, down, left or right
+ * if in the way is a wall the number of lives will decrease
+ * at the end this function checks if the player arrived at the food spot and returns true or false depending on that
+ */
 bool moveLed(int level) {
   xValue = analogRead(pinX);
   yValue = analogRead(pinY);
-  if (xValue > maxThreshold && movedX == false) {
-    if (checkIfOneIsOnPos(level, posX + 1, posY)) {
-      currentLives--;
+  unsigned long currentTime = millis();
+  if (currentTime - playTimeDelay >= 25) {
+    if (xValue > maxThreshold && movedX == false) {
+      if (checkIfOneIsOnPos(level, posX + 1, posY)) {
+        currentLives--;
+      }
+      if (posX < 8 && (checkIfOneIsOnPos(level, posX + 1, posY) == false)) {
+        oldPosX = posX;
+        oldPosY = posY;
+        posX++;
+      }
+      else if (posX == 8 && (checkIfOneIsOnPos(level, 0, posY) == false)) {
+        oldPosX = posX;
+        oldPosY = posY;
+        posX = 0;
+      }
+      movedX = true;
     }
-    if (posX < 8 && (checkIfOneIsOnPos(level, posX + 1, posY) == false)) {
-      oldPosX = posX;
-      oldPosY = posY;
-      posX++;
+    if (xValue < minThreshold && movedX == false) {
+      if (checkIfOneIsOnPos(level, posX - 1, posY)) {
+        currentLives--;
+      }
+      if (posX > 0 && (checkIfOneIsOnPos(level, posX - 1, posY) == false)) {
+        oldPosX = posX;
+        oldPosY = posY;
+        posX--;
+      }
+      else if (posX == 0 && (checkIfOneIsOnPos(level, 7, posY) == false)) {
+        oldPosX = posX;
+        oldPosY = posY;
+        posX = 7;
+      }
+      movedX = true;
     }
-    else if (posX == 8 && (checkIfOneIsOnPos(level, 0, posY) == false)) {
-      oldPosX = posX;
-      oldPosY = posY;
-      posX = 0;
+    if (xValue >= minThreshold && xValue <= maxThreshold) {
+      movedX = false;
     }
-    movedX = true;
-  }
-  if (xValue < minThreshold && movedX == false) {
-    if (checkIfOneIsOnPos(level, posX - 1, posY)) {
-      currentLives--;
+    if (yValue > maxThreshold && movedY == false) {
+      if (checkIfOneIsOnPos(level, posX, posY - 1)) {
+        currentLives--;
+      }
+      if (posY > 0 && (checkIfOneIsOnPos(level, posX, posY - 1) == false)) {
+        oldPosY = posY;
+        oldPosX = posX;
+        posY--;
+      }
+      else if (posY == 0 && (checkIfOneIsOnPos(level, posX, 7) == false)) {
+        oldPosY = posY;
+        oldPosX = posX;
+        posY = 7;
+      }
+      movedY = true;
     }
-    if (posX > 0 && (checkIfOneIsOnPos(level, posX - 1, posY) == false)) {
-      oldPosX = posX;
-      oldPosY = posY;
-      posX--;
+    if (yValue < minThreshold && movedY == false) {
+      if (checkIfOneIsOnPos(level, posX, posY + 1)) {
+        currentLives--;
+      }
+      if (posY < 8 && (checkIfOneIsOnPos(level, posX, posY + 1) == false)) {
+        oldPosY = posY;
+        oldPosX = posX;
+        posY++;
+      }
+      else if (posY == 8 && (checkIfOneIsOnPos(level, posX, 0) == false)) {
+        oldPosY = posY;
+        oldPosX = posX;
+        posY = 0;
+      }
+      movedY = true;
     }
-    else if (posX == 0 && (checkIfOneIsOnPos(level, 7, posY) == false)) {
-      oldPosX = posX;
-      oldPosY = posY;
-      posX = 7;
+    if (yValue >= minThreshold && yValue <= maxThreshold) {
+      movedY = false;
     }
-    movedX = true;
-  }
-  if (xValue >= minThreshold && xValue <= maxThreshold) {
-    movedX = false;
-  }
-  if (yValue > maxThreshold && movedY == false) {
-    if (checkIfOneIsOnPos(level, posX, posY - 1)) {
-      currentLives--;
+    bool checking = checkIfHitFood();
+    lc.setLed(0, oldPosX, oldPosY, false);
+    lc.setLed(0, posX, posY, true);
+    playTimeDelay = currentTime;
+    if (checking && eaten == false) {
+      eaten = true;
+      return true;
     }
-    if (posY > 0 && (checkIfOneIsOnPos(level, posX, posY - 1) == false)) {
-      oldPosY = posY;
-      oldPosX = posX;
-      posY--;
-    }
-    else if (posY == 0 && (checkIfOneIsOnPos(level, posX, 7) == false)) {
-      oldPosY = posY;
-      oldPosX = posX;
-      posY = 7;
-    }
-    movedY = true;
-  }
-  if (yValue < minThreshold && movedY == false) {
-    if (checkIfOneIsOnPos(level, posX, posY + 1)) {
-      currentLives--;
-    }
-    if (posY < 8 && (checkIfOneIsOnPos(level, posX, posY + 1) == false)) {
-      oldPosY = posY;
-      oldPosX = posX;
-      posY++;
-    }
-    else if (posY == 8 && (checkIfOneIsOnPos(level, posX, 0) == false)) {
-      oldPosY = posY;
-      oldPosX = posX;
-      posY = 0;
-    }
-    movedY = true;
-  }
-  if (yValue >= minThreshold && yValue <= maxThreshold) {
-    movedY = false;
-  }
-  bool checking = checkIfHitFood();
-  lc.setLed(0, oldPosX, oldPosY, false);
-  lc.setLed(0, posX, posY, true);
-  delay(25);
-  if (checking && eaten == false) {
-    eaten = true;
-    return true;
-  }
-  return false;
-}
-
-void selectOption() {
-  int xAxis = analogRead(pinX);
-  if (xAxis < lowAxis && xAxisReset) {
-    menuSelected--;
-    if (menuSelected < 1) {
-      menuSelected = 4;
-    }
-    xAxisReset = 0;
-  }
-  else if (xAxis > highAxis && xAxisReset) {
-    menuSelected++;
-    if (menuSelected > 4) {
-      menuSelected = 1;
-    }
-    xAxisReset = 0;
-  }
-  else if (xAxis >= lowAxis && xAxis <= highAxis) {
-    xAxisReset = 1;
-  }
-  displayMenu();
-}
-
-void changeSettings() {
-  if (millis() - lastDisplayMillis > displayDelay) {
-    lcd.clear();
-    lcd.print("Level: ");
-    lcd.print(startingLevelValue);
-    lcd.setCursor(0, 1);
-    lcd.print(currentPlayer);
-    lastDisplayMillis = millis();
-  }
-  int xAxis = analogRead(pinX);
-  int yAxis = analogRead(pinY);
-  Serial.println(yAxis);
-  if (yAxis < 100) {
-    freeSpace();
-  }
-  if (yAxis >800) {
-    
-  }
-  if (xAxis < lowAxis && xAxisReset) {
-    startingLevelValue--;
-    if (startingLevelValue < 1) {
-      startingLevelValue = 3;
-    }
-    xAxisReset = 0;
-  }
-  else if (xAxis > highAxis && xAxisReset) {
-    startingLevelValue++;
-    if (startingLevelValue > 3) {
-      startingLevelValue = 1;
-    }
-    xAxisReset = 0;
-  }
-  else if (xAxis >= lowAxis && xAxis <= highAxis) {
-    xAxisReset = 1;
-  }
-  refreshName();
-  if (buttonGotPressed()) {
-    menuWasSelected = 0;
+    return false;
   }
 }
-
+/*
+ * if the player wants to change the name he has to use the serial monitor and put it as an input
+ */
 void refreshName() {
   while (Serial.available() > 0) {
     int incomingByte = Serial.read();
@@ -682,62 +781,4 @@ void refreshName() {
     }
   }
   justPass = 0;
-}
-
-void displayMenu() {
-  unsigned long currentMillis = millis();
-  if (currentMillis - lastDisplayMillis > displayDelay) {
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    if (menuSelected == 1) {
-      lcd.print(">");
-    }
-    else {
-      lcd.print(" ");
-    }
-    lcd.print("Start ");
-    if (menuSelected == 2) {
-      lcd.print(">");
-    }
-    else {
-      lcd.print(" ");
-    }
-    lcd.print("Setup");
-    
-    lcd.setCursor(0, 1);
-    if (menuSelected == 3) {
-      lcd.print(">");
-    }
-    else {
-      lcd.print(" ");
-    }
-    lcd.print("HighScore ");
-    if (menuSelected == 4) {
-      lcd.print(">");
-    }
-    else {
-      lcd.print(" ");
-    }
-    lcd.print("Info");
-    
-    lastDisplayMillis = currentMillis;
-  }
-}
-
-void displayHighScore() {
-  if (EEPROM[0] == 0) {
-    lcd.clear();
-    lcd.print("Nothing 0");
-  } else {
-    lcd.clear();
-    lcd.print(bestPlayer);
-    lcd.print(" ");
-    lcd.print(gameHighScore);
-  }
-  while(1) {
-    if (buttonGotPressed()) {
-      menuWasSelected = 0;
-      break;
-    }
-  }
 }
