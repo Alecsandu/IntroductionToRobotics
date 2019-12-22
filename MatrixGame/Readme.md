@@ -59,4 +59,4 @@ So if you want to beat the highest score you need to have both luck and skill.
 ## Game presentation
 Link to the video:https://youtu.be/unNmHX2CIIg
 
-Link to the image of the project:
+Link to the image of the project:https://drive.google.com/file/d/1sljk9I1atlTDdTxXl9j89HE8bjMNos2N/view?usp=sharing
