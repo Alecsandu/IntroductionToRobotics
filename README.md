@@ -1,2 +1,2 @@
 # IntroductionToRobotics
-Here are the homeworks that I had at this course.
+Here are the assignments that I had at this course.
