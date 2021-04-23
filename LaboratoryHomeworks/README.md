@@ -2,6 +2,7 @@
 
 ### 1st Homework
 **fileName**: analogRGBControl
+<br />
 **description**: This program will read the values from 3 different potentiometers with the help of analogRead() function.
 After that it will map those values using the map(potValue, 0, 1023, 0, 255) because the read values are between 0 and 1023 and 
 the written values are between 0 and 255, so in the end the value that we will use will be between 0 and 255.
