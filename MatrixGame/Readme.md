@@ -5,7 +5,7 @@ You play as "Snacko" a lazy snake that has awakened after a long and cold winter
 
 Either way, if you get it or not, you will have to direct Snacko to a new food spot until he will be bored and go back to sleep.
 
-So, if you want to achive a great score you will have to move him quick and watch out for the walls, because if you make him hit them too many times he will get injured and eventually die.
+So, if you want to achive a great score you will have to move him quick and watch out for the walls, because if you make him hit them too many times he will get injured and eventually go back to sleep.
 
 ## How to play
 In order to start the game you will have to select the start option on the LCD screen and press the button of the joystick.
