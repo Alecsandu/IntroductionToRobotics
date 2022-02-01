@@ -1,7 +1,7 @@
 # LED MATRIX GAME - Agility SNAKE
 
 ## The game / Story
-You play as "Snacko" a lazy snake that has awakened after a long and cold winter. Now he is hungry and wants you to direct him to the prey as fast as you can because after some time the prey will notice him and disappear.
+You play as "Snacko" a lazy snake that has awakened after a long and cold winter. Now he is hungry and wants you to direct him to the prey as fast as you can because after some time the prey will notice him and run.
 
 Either way, if you get it or not, you will have to direct Snacko to a new food spot until he will be bored and go back to sleep.
 
@@ -12,7 +12,7 @@ In order to start the game you will have to select the start option on the LCD s
 
 After that with the help of the X and Y axis of the joystick you will change Snacko's position one at a time either up, down, left or right, to get the food until the time is up or if you lose all your lives.
 
-After the time is up or your Snacko died you will see your score and will be asked to press the button in order to get back to the main menu.
+When the time is up or your Snacko went to sleep you will see your score and will be asked to press the button in order to get back to the main menu.
 
 ## Main menu (LCD's screen)
 It has 4 options to choose from:
@@ -31,11 +31,15 @@ Here you can see the name of the game, my name (the creator of the game), my Git
 - Depending on the level you choosed, the amount of seconds that you have in order to get to the food spot will vary
 
 ## Technical requirements / Hardware used
-The game is displayed on on a 8x8 matrix using a MAX7219 driver.
+The game is displayed on on a 8x8 matrix using a <b>MAX7219</b> driver.
 
 For the controls it is used a joystick.
 
-While you are playing the game you can see on the LCD screen the number of lives, the level that you selected to play, score and how much time is left.
+While you are playing the game you can see on the LCD screen the following informations:
+1. Number of lives
+2. The level that you selected to play
+3. The score
+4. How much time is left
 
 You can control the LCD's contrast with the help of a potentiometer.
 
@@ -51,12 +55,12 @@ So if you want to beat the highest score you need to have both luck and skill.
 - 1 * Potentiometer<br/>
 - Wires<br/>
 - Resistors (220 Ohm & 10k Ohm)<br/>
-- Arduino<br/>
-- Connector cable<br/>
+- 1 * Arduino<br/>
+- 1 * Connector cable<br/>
 - 1 * Breadbord<br/>
 - 1 * Mini Breadbords<br/> 
 
 ## Game presentation
-Link to the video:https://youtu.be/unNmHX2CIIg
+Game demo showing the features: [Arduino matrix snake game](https://youtu.be/unNmHX2CIIg)
 
-Link to the image of the project:https://drive.google.com/file/d/1sljk9I1atlTDdTxXl9j89HE8bjMNos2N/view?usp=sharing
+Link to the image of the project: https://drive.google.com/file/d/1sljk9I1atlTDdTxXl9j89HE8bjMNos2N/view?usp=sharing
