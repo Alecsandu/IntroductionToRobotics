@@ -1,4 +1,4 @@
-// pins for the 4 digit 7-segment display
+// Pins for the 4 digit 7-segment display
 const int pinA = 12;
 const int pinB = 8;
 const int pinC = 5;
@@ -12,7 +12,7 @@ const int pinD2 = 9;
 const int pinD3 = 10;
 const int pinD4 = 13;
 
-// pins for the joystick
+// Pins for the joystick
 const int pinX = A0;
 const int pinY = A1;
 const int pinButton = A2; 
@@ -21,7 +21,7 @@ const int segSize = 8;
 const int noOfDisplays = 4;
 const int noOfDigits = 10;
 
-// variables used for the joystick
+// Variables used for the joystick
 int xAxis;
 int yAxis;
 const int highAxis = 750;
@@ -94,7 +94,7 @@ void displayNumbers(int nums[]) {
     else {
       displayNumber(nums[i], LOW);
     }
-    // for stability
+    // Used for stability
     delay(1);
   }
 }
@@ -114,7 +114,7 @@ void loop() {
   yAxis = analogRead(pinY);
   buttonState = digitalRead(pinButton);
   if(digitSelected >= 0) {
-    // here the value of the digit selected is increased/ decreased here
+    // From here the value of the digit selected is increased or decreased (the type of operation depends on the joystick movement)
     if((yAxis > highAxis) && (millis() - lastMillis > millisWaitInterval)) {
       numbers[digitSelected]--;
       if(numbers[digitSelected] < 0) {
@@ -137,7 +137,7 @@ void loop() {
       lastButtonState = buttonState;
     }
   } else {
-    //     here we change the digit for which we will increase or decrease its value
+    // From here we change the digit for which we will increase or decrease its value(again the type of operation depends on the joystick movement)
     if((xAxis > highAxis) && (millis() - lastMillis > millisWaitInterval)) {
       digitSelected--;
       if(digitSelected == - noOfDisplays - 1) {
