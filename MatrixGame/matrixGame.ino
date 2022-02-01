@@ -3,7 +3,7 @@
 #include <LedControl.h>
 #include <string.h>
 #define MAX_NAME_LEN 10
-/*--------------------For lcd-----------------------------------*/
+/*----------------------------------For lcd----------------------------------*/
 const int RSPin = 9;
 const int EPin = 6;
 const int D4Pin = 5;
@@ -16,7 +16,7 @@ char currentPlayer[MAX_NAME_LEN + 1] = "Playa";
 unsigned long int lastDisplayMillis = 0;
 int displayDelay = 200;
 int startingLevelValue = 1;
-int currentLives = 3;             /*--------lives------*/  
+int currentLives = 3; // Deault amount of lifes  
 unsigned long int startingTime = 0;
 int menuSelected = 1;
 int menuWasSelected = 0;
@@ -24,13 +24,13 @@ int funcChange = 1;
 int gameHighScore = 0;
 int charNo = 0;
 int justPass = 0;
-/*------------------For matrix----------------------------------*/
+/*----------------------------------For matrix----------------------------------*/
 const int brightness = 8;
 const int dinPin = 12;
 const int clkPin = 11;
 const int loadPin = 10;
 const int noOfDrivers = 1;
-//level 1
+/*----------------------------------Level 1 map----------------------------------*/
 byte lvl1Matrix[8][8] = {
   {0, 0, 0, 0, 0, 0, 0, 0},
   {0, 0, 0, 0, 0, 0, 0, 0},
@@ -42,7 +42,7 @@ byte lvl1Matrix[8][8] = {
   {0, 0, 0, 0, 0, 0, 0, 0}
 };
 const int timeToGetFood1 = 6000;
-//level 2
+/*----------------------------------Level 2 map----------------------------------*/
 byte lvl2Matrix[8][8] = {
   {1, 0, 0, 0, 0, 0, 0, 1},
   {0, 0, 0, 0, 0, 0, 0, 0},
@@ -54,7 +54,7 @@ byte lvl2Matrix[8][8] = {
   {1, 0, 0, 0, 0, 0, 0, 1}
 };
 const int timeToGetFood2 = 5000;
-//level 3
+/*----------------------------------Level 3 map----------------------------------*/
 byte lvl3Matrix[8][8] = {
   {1, 1, 1, 1, 1, 1, 1, 1},
   {1, 0, 0, 0, 0, 0, 0, 1},
@@ -88,7 +88,7 @@ bool helloMatrice[8][8] = {
 const int timeToGetFood3 = 4000;
 LedControl lc = LedControl(dinPin, clkPin, loadPin, noOfDrivers);// DIN, CLK, LOAD, NoOfDrivers
 
-/*----------------------For joystick------------------------------*/
+/*----------------------------------For joystick----------------------------------*/
 const int pinX = A3;
 const int pinY = A4;
 const int buttonPin = 8;
@@ -106,7 +106,7 @@ const int lowAxis = 100;
 const int highAxis = 800;
 int xAxisReset = 1;
 int lastButtonValue = 1;
-/*---------------------------For snako----------------------------------------*/
+/*----------------------------------For snako----------------------------------*/
 int foodX = 2;
 int foodY = 2;
 int oldFoodX = 2;
@@ -125,19 +125,19 @@ bool ok = false;
 bool moreLife = false;
 unsigned long theTime = 0;
 unsigned long prevTime = 0;
-unsigned long playTimeDelay = 0;// for the 25 delay
+unsigned long playTimeDelay = 0; // For the 25 delay
 
 void setup() {
   randomSeed(analogRead(0));
   lcd.begin(16, 2);
-  lc.shutdown(0, false); // turn of power saving, enables display
-  lc.setIntensity(0, brightness);// sets brightness (0~15 possible values)
+  lc.shutdown(0, false); // Turn of power saving, enables display
+  lc.setIntensity(0, brightness); // Set brightness (0~15 possible values)
   lc.clearDisplay(0);
   pinMode(pinX, INPUT);
   pinMode(pinY, INPUT);
   pinMode(buttonPin, INPUT_PULLUP);
-  loadHighScore(); //loads the highest score when the game is turned on
-  helloWorld(); //print an welcome message when the game is turned on
+  loadHighScore(); // Load the highest score when the game is turned on
+  helloWorld(); // Print an welcome message when the game is turned on
   Serial.begin(9600);
 }
 
@@ -166,7 +166,10 @@ void loop() {
     }
   }
 }
-// This function displays a welcome message on the lcd when the game is turned on
+
+/*
+  Displays a welcome message on the lcd when the game is turned on
+*/
 void helloWorld() {
   for (int row = 0; row < 8; ++row) {
     for (int col = 0; col < 8; ++col) {
@@ -180,11 +183,14 @@ void helloWorld() {
   lcd.print("   Agility Snake");
   lcd.setCursor(0, 1);
   lcd.print("Test your speed");
-  delay(3000);//here I used delay because it will be executed only once
+  delay(3000); // Here the delay is used because it will be executed only once
   lcd.clear();
   lc.clearDisplay(0);
 }
-// selectOption() helps you select the option from the main menu that you want to use(Start, Setup, Highscore or Info)
+
+/* 
+  This function helps players to pick an option from the main menu (Start, Setup, Highscore or Info) with the help of the joystick
+*/
 void selectOption() {
   int xAxis = analogRead(pinX);
   if (xAxis < lowAxis && xAxisReset) {
@@ -246,9 +252,10 @@ void displayMenu() {
     lastDisplayMillis = currentMillis;
   }
 }
+
 /*
- * Before each new game I reinitialize some of the variables that are going to be used again
- */
+  Before each new game some of the variables are going to be reinitialized
+*/
 void initGame(int lvl) {
   if (!initFood) {
     theTime = 30;
@@ -282,7 +289,7 @@ void initGame(int lvl) {
 }
 
 void playGame(int level) {
-  // here I see if its the first time that I use this function
+  // Check if its the first time that this function is called when a new game is started
   if (funcChange) {
     currentLives = 3;
     previousMillis = 0;
@@ -298,15 +305,15 @@ void playGame(int level) {
     eaten = false;
   }
   unsigned long st = millis();
-  /*Each second decreases the amount of time that is left
-   *(only the variable that is used to display it)
-   */
+  
+  // Each second decreases the amount of time that is left (only the variable that is used to display it)
   if (st - prevTime >= 1000) {
     prevTime = st;
     --theTime;
   }
   unsigned long start = millis();
-  if(start - prevMil >= getInterval(level)) {//here I check if arrived in time at the food spot and if not I generate a new position for the food spot
+  // Check if the player arrived in time at the food spot and if not I generate a new position for the food spot
+  if(start - prevMil >= getInterval(level)) {
     prevMil = start;
     if(ok){
       makeNewFood(level);
@@ -316,8 +323,9 @@ void playGame(int level) {
     }
   }
   blinkFood();
+  // If the highscore was bested, award the player with a bonus life
   if (currentScore > gameHighScore) {
-    if (!moreLife) {//if the highscore was bested I awart it with a bonus life
+    if (!moreLife) {
       currentLives++;
       moreLife = true;
     }
@@ -328,9 +336,9 @@ void playGame(int level) {
   displayGameStatus(level);
   if (gameEnded()) {
     /*
-     * here I check if the player died or the time is up 
-     * if the player died I load a matrix that displays a X on the 8x8 matrix and show the score on the lcd
-     * else I leave the matrix unchanged and just display the score on the lcd
+     * Check if the player died or the time is up 
+     * If the player died load a matrix which displays an X on the 8x8 matrix and show the score on the lcd
+     * Otherwise leave the matrix unchanged and display the score on the lcd
      */
     if (currentLives != 0) {
       lcd.clear();
@@ -356,8 +364,9 @@ void playGame(int level) {
       }
     }
     /*
-     * Here I use while (1) because I just wait for the user to push the button to go back to the main menu, also nothing else is waiting to be done apart from the push of the button
-     */
+      The statement 'while (1)' is used because the program just waits for the user to push the button to go back to the main menu,
+      also nothing else is waiting to be done apart from the push of the button and no other functions are called
+    */
     while (1) {
       if (buttonGotPressed()) {
         menuWasSelected = 0;
@@ -368,11 +377,14 @@ void playGame(int level) {
     }
   }
 }
+
 /*
- * Here you can change the level that you want to play
- * or chnage the name that you want to have if opened the serial monitor
- * or you can reset the highscore(this is not shown in anyway on the lcd, you have to know that you you use the yAxis of the joystick and turn it on the right side the score will reset)
- */
+  Here the player can change the map/level,
+  or chnage the name if the serial monitor is open,
+  or can reset the highscore (this is not shown in anyway on the lcd,
+      the player has to know that by using the yAxis of the joystick and
+      turning it on the right side the score will reset)
+*/
 void changeSettings() {
   if (millis() - lastDisplayMillis > displayDelay) {
     lcd.clear();
@@ -382,12 +394,15 @@ void changeSettings() {
     lcd.print(currentPlayer);
     lastDisplayMillis = millis();
   }
+  
   int xAxis = analogRead(pinX);
   int yAxis = analogRead(pinY);
   Serial.println(yAxis);
+  
   if (yAxis < 100) {
     freeSpace();
   }
+  
   if (xAxis < lowAxis && xAxisReset) {
     startingLevelValue--;
     if (startingLevelValue < 1) {
@@ -406,13 +421,15 @@ void changeSettings() {
     xAxisReset = 1;
   }
   refreshName();
+  
   if (buttonGotPressed()) {
     menuWasSelected = 0;
   }
 }
 
 void displayHighScore() {
-  if (EEPROM[0] == 0) { //if there is no score saved display 0
+  // If there is no score saved display 0
+  if (EEPROM[0] == 0) {
     lcd.clear();
     lcd.print("Nothing 0");
   } else {
@@ -421,9 +438,11 @@ void displayHighScore() {
     lcd.print(" ");
     lcd.print(gameHighScore);
   }
+ 
   /*
-   * Here I use while (1) because I don't stop something from executing and just wait to press the button after I choosed what I want to do
-   */
+    The statement 'while (1)' is used because the program doesn't stop something from executing
+    and just waits for the player to press the button after it choosed what it wants to do
+  */
   while (1) {
     if (buttonGotPressed()) {
       menuWasSelected = 0;
@@ -431,8 +450,11 @@ void displayHighScore() {
     }
   }
 }
-/*This function displays the name of the game, creator, my GitHub link and @UnibucRobotics
-I used delay() function here because info() is executed only once and after that I go back at displaying the main menu on the lcd*/
+
+/*
+  This function displays the name of the game, creator, my GitHub link and @UnibucRobotics
+  The 'delay' function is used here because 'info()' is executed only once and after that the program goes back at displaying the main menu on the lcd
+*/
 void info() {
     lcd.clear();
     lcd.setCursor(0, 0);
@@ -461,7 +483,7 @@ void info() {
     lcd.print("@ UnibucRobotics");
 
     delay(2000);
-    menuWasSelected = 0;//this signals that I don't want to display info() again on the lcd 
+    menuWasSelected = 0; // This signals that I don't want to display 'info()' again on the lcd 
 }
 
 void saveHighScore() {
@@ -494,8 +516,8 @@ void loadHighScore() {
 }
 
 /*
- * I use this function to reset the highscore
- */
+  This function is used to reset the highscore
+*/
 void freeSpace() {
   gameHighScore = 0;
   bestPlayer[0] = "Nothing";
@@ -504,6 +526,9 @@ void freeSpace() {
   }
 }
 
+/*
+  Utility function which helps us determine if the joystick button was pressed or not
+*/
 int buttonGotPressed() {
   int buttonValue = digitalRead(buttonPin);
   if (buttonValue == 0 && lastButtonValue == 1) {
@@ -515,9 +540,14 @@ int buttonGotPressed() {
   }
   return 0;
 }
+
 /*
- * After the game starts this function displays on the lcd the number of lives, the level, the score and the remaining time until the game ends
- */
+  After the game starts this function displays on the lcd:
+  - number of lives
+  - level
+  - score
+  - remaining time until the game ends
+*/
 void displayGameStatus(int lvl) {
   unsigned long currentMillis = millis();
   if (currentMillis - lastDisplayMillis > displayDelay) {
@@ -536,7 +566,9 @@ void displayGameStatus(int lvl) {
   }
 }
 
-//Depending on the matrix that coresponds to the selected level
+/*
+  Loads a level depending on the matrix that coresponds to the selected level
+*/
 void loadMatrixLevel(int level) {
   if (level == 1) {
     for (int row = 0;row < 8;row++) {
@@ -566,9 +598,10 @@ void loadMatrixLevel(int level) {
     }
   }
 }
+
 /*
- * If the time is up or if the player lost all its lives the game stops
- */
+  If the time is up or if the player lost all its lives the game stops
+*/
 int gameEnded() {
   unsigned long mil = millis();
   if (mil - startingTime > 30000) { 
@@ -581,9 +614,10 @@ int gameEnded() {
   }
   return 0;
 }
+
 /*
- * makeNewFood generates a new food position that is not in the walls or on the current position of the player or on the same position of the old food once again
- */
+  This function generates a new food position that is NOT in the walls or on the current position of the player or on the same position of the old food once again
+*/
 void makeNewFood(int lvl) {
   oldFoodX = foodX;
   oldFoodY = foodY;
@@ -627,9 +661,10 @@ void blinkFood() {
     }
   }
 }
+
 /*
- * getInterval returns the amount of time that a player has to get to a food spot until a new one is generated
- */
+  This function returns the amount of time that a player has to get to a food spot until a new one is generated
+*/
 int getInterval(int lvl) {
   if (lvl == 1)
     return timeToGetFood1;
@@ -638,9 +673,10 @@ int getInterval(int lvl) {
   else if(lvl == 3)
     return timeToGetFood3;
 }
+
 /*
- * this function checks if there is a wall on the position (x, y) from the map of the level 'lvl'
- */
+  This function checks if there is a wall on the position (x, y) from the map of the level 'level'
+*/
 bool checkIfOneIsOnPos(int level, int x, int y) {
   if (level == 1) {
     if (lvl1Matrix[x][y] == 1) {
@@ -664,11 +700,12 @@ bool checkIfOneIsOnPos(int level, int x, int y) {
     }
   }
 }
+
 /*
- * moveLed changes the position of the player depending on his choice up, down, left or right
- * if in the way is a wall the number of lives will decrease
- * at the end this function checks if the player arrived at the food spot and returns true or false depending on that
- */
+  This function changes the position of the player depending on his choice up, down, left or right
+  if in the way is a wall the number of lives will decrease,
+  at the end, this function checks if the player arrived at the food spot and returns true or false depending on that
+*/
 bool moveLed(int level) {
   xValue = analogRead(pinX);
   yValue = analogRead(pinY);
@@ -755,9 +792,10 @@ bool moveLed(int level) {
     return false;
   }
 }
+
 /*
- * if the player wants to change the name he has to use the serial monitor and put it as an input
- */
+  If the player wants to change the name, it has to use the serial monitor and put it as an input
+*/
 void refreshName() {
   while (Serial.available() > 0) {
     int incomingByte = Serial.read();
