@@ -7,7 +7,10 @@ const int bluePin = 9;
 int redValue = 0;
 int greenValue = 0;
 int blueValue = 0;
-// in setup it is configured each pin to behave either as an input or an output
+
+/*
+  In setup it is configured each pin to behave either as an input or an output
+*/
 void setup() {
   pinMode(redIn, INPUT);
   pinMode(greenIn, INPUT);
@@ -21,15 +24,20 @@ void loop() {
   redValue = analogRead(redIn);
   greenValue = analogRead(greenIn);
   blueValue = analogRead(blueIn);
-  /* after we read the values from the 3 potentiometers we use the map function
-  because the read values are between 0..1023 and the written values are
-  between 0..255 */
+  /*
+    After we read the values from the 3 potentiometers, the map function is used
+    because stored values are between 0-1023 and the written values must be
+    between 0-255
+  */
   redValue = map(redValue, 0, 1023, 0, 255);
   greenValue = map(greenValue, 0, 1023, 0, 255);
   blueValue = map(blueValue, 0, 1023, 0, 255);
   setColor(redValue, greenValue, blueValue);
 }
-// I use this function to control each color channel of the RGB LED
+
+/*
+  This function is used to control each color channel of the RGB LED
+*/
 void setColor(int red, int green, int blue) {
   analogWrite(redPin, red);
   analogWrite(greenPin, green);
