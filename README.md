@@ -1,2 +1,2 @@
 # IntroductionToRobotics
-Here are the assignments that I had at this course.
+This repository stores the projects which I had at this course
