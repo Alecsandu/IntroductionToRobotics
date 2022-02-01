@@ -4,7 +4,7 @@
 
 #define MAX_NAME_LEN 10
 
-// variables for the LCD pins
+// Variables used for the LCD pins
 const int RSPin = 12;
 const int EPin = 11;
 const int D4Pin = 5;
@@ -13,9 +13,9 @@ const int D6Pin = 3;
 const int D7Pin = 2;
 LiquidCrystal lcd(RSPin, EPin, D4Pin, D5Pin, D6Pin, D7Pin);
 
-// variables for the menu and various places of the program
+// Variables for the menu and various places of the program
 char bestPlayer[MAX_NAME_LEN + 1] = "Nothing";
-char currentPlayer[MAX_NAME_LEN + 1] = "Playa";
+char currentPlayer[MAX_NAME_LEN + 1] = "Player";
 unsigned long int lastDisplayMillis = 0;
 int displayDelay = 200;
 int startingLevelValue = 0;
@@ -28,7 +28,7 @@ int gameHighScore = 0;
 int charNo = 0;
 int justPass = 0;
 
-// variables for the joystick pins and different functions
+// Variables for the joystick pins and different functions
 const int pinX = A5;
 const int pinY = A4;
 const int buttonPin = 8;
@@ -43,12 +43,11 @@ void setup() {
   pinMode(pinY, INPUT);
   pinMode(buttonPin, INPUT_PULLUP);
   Serial.begin(9600);
-  //freeSpace();   // I call this function when I want to get rid of the highest score that is stored  
+  //freeSpace();   // This function is used when we want to get rid of the highest score that is stored  
   loadHighscore();
 }
 
 void loop() {
-  
   if (!menuWasSelected) {
     if (buttonGotPressed()){
       menuWasSelected = 1;
@@ -108,14 +107,17 @@ void freeSpace() {
 void displayGameStatus(int currentLives, int levelValue, int currentScore) {
   if (millis() - lastDisplayMillis > displayDelay) {
     lcd.clear();
+    
     lcd.setCursor(0, 0);
     lcd.print("Lives:");
     lcd.print(currentLives);
     lcd.print(" Level:");
     lcd.print(levelValue);
+    
     lcd.setCursor(0, 1);
     lcd.print("Score: ");
     lcd.print(currentScore);
+    
     lastDisplayMillis = millis();
   }
 }
@@ -145,7 +147,7 @@ void playGame() {
     startingTime = millis();
     funcChange = 0;
   }
-  int levelValue = startingLevelValue + (millis() - startingTime)/5000;
+  int levelValue = startingLevelValue + (millis() - startingTime) / 5000;
   int currentScore = levelValue * 3;
   if (currentScore > gameHighScore) {
     gameHighScore = currentScore;
